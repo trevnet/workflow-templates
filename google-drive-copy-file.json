@@ -1,0 +1,24 @@
+{
+  "id": "copy_file",
+  "type": "javascript",
+  "meta": {
+    "code": "    let response = await fetch(`https://www.googleapis.com/drive/v3/files/${parameters.file_id}/copy`, {\n        method: \"POST\",\n        headers: {\n            \"Accept\": \"application/json\",\n            \"Content-Type\": \"application/json\",\n            \"Authorization\": `Bearer ${parameters.access_token}`\n        },\n        body: JSON.stringify({\n            name: parameters.name\n        })\n    })\n    if (!response.ok) {\n        throw new Error(`Bad response: ${response.status} - ${response.body}`)\n    }\n    return await response.json()",
+    "parameters": [
+      {
+        "key": "file_id",
+        "type": "string",
+        "value": ""
+      },
+      {
+        "key": "access_token",
+        "type": "string",
+        "value": ""
+      },
+      {
+        "key": "name",
+        "type": "string",
+        "value": ""
+      }
+    ]
+  }
+}

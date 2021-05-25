@@ -1,0 +1,36 @@
+{
+  "id": "779739fc-3189-4984-814c-48bbf92dcebd",
+  "key": "google-oauth",
+  "type": "oauth",
+  "deleted": false,
+  "createdDateTime": "2021-04-27T02:39:04Z",
+  "meta": {
+    "callbackValue": "",
+    "parameters": [
+      {
+        "type": "string",
+        "key": "client_id",
+        "value": ""
+      },
+      {
+        "type": "string",
+        "key": "client_secret",
+        "value": ""
+      },
+      {
+        "type": "string",
+        "key": "callback_url",
+        "value": "http://localhost:32823"
+      },
+      {
+        "type": "string",
+        "key": "state",
+        "value": "779739fc-3189-4984-814c-48bbf92dcebd"
+      }
+    ],
+    "requestCode": "    // Taken from here: https://developers.google.com/identity/protocols/oauth2/web-server\n    let url = `https://accounts.google.com/o/oauth2/v2/auth`\n    let queryParameters = {\n        \"client_id\": parameters.client_id,\n        \"response_type\": \"code\",\n        \"access_type\": \"offline\",\n        \"redirect_uri\": parameters.callback_url,\n        \"scope\": \"https://www.googleapis.com/auth/drive\",\n        \"state\": parameters.state\n    }\n\n    let parametersString = \"\"\n    Object.keys(queryParameters).forEach((key, index) =\u003e {\n        let delimiter = \"?\"\n        if (index \u003e 0) {\n            delimiter = \"\u0026\"\n        }\n        parametersString += delimiter + key + \"=\" + encodeURIComponent(queryParameters[key])\n    })\n\n    return await runShellCommand(`open \"${url}${parametersString}\"`)",
+    "callbackCode": "    // Get the code out of the callback query string\n    let queryParameters = parameters.callbackQueryString.split(\"\u0026\")\n    let code = \"\"\n    for (let queryParam of queryParameters) {\n        let paramParts = queryParam.split(\"=\")\n        if (paramParts[0] === \"code\") {\n            code = decodeURIComponent(paramParts[1])\n        }\n    }\n\n    // Exchange the code for a refresh_token\n    // Taken from here: https://developers.google.com/identity/protocols/oauth2/web-server\n    let url = `https://oauth2.googleapis.com/token`\n    let data = {\n        \"code\": code,\n        \"client_id\": parameters.client_id,\n        \"client_secret\": parameters.client_secret,\n        \"redirect_uri\": parameters.callback_url,\n        \"grant_type\": \"authorization_code\",\n    }\n\n    let parametersString = \"\"\n    Object.keys(data).forEach((key, index) =\u003e {\n        let delimiter = \"\"\n        if (index \u003e 0) {\n            delimiter = \"\u0026\"\n        }\n        parametersString += delimiter + key + \"=\" + encodeURIComponent(data[key])\n    })\n\n    let response = await fetch(url, {\n        method: \"POST\",\n        headers: {\n            \"Content-Type\": \"application/x-www-form-urlencoded\"\n        },\n        body: parametersString\n    })\n    if (!response.ok) {\n        throw new Error(`Bad response: ${response.status} - ${response.body}`)\n    }\n\n    let finalData = await response.json()\n    return finalData.refresh_token",
+    "refreshCode": "    // Taken from here: https://developers.google.com/identity/protocols/oauth2/web-server\n    let url = `https://oauth2.googleapis.com/token`\n    let data = {\n        \"refresh_token\": parameters.callbackValue,\n        \"client_id\": parameters.client_id,\n        \"client_secret\": parameters.client_secret,\n        \"redirect_uri\": parameters.callback_url,\n        \"grant_type\": \"refresh_token\",\n    }\n\n    let parametersString = \"\"\n    Object.keys(data).forEach((key, index) =\u003e {\n        let delimiter = \"\"\n        if (index \u003e 0) {\n            delimiter = \"\u0026\"\n        }\n        parametersString += delimiter + key + \"=\" + encodeURIComponent(data[key])\n    })\n\n    let response = await fetch(url, {\n        method: \"POST\",\n        headers: {\n            \"Content-Type\": \"application/x-www-form-urlencoded\"\n        },\n        body: parametersString\n    })\n    if (!response.ok) {\n        throw new Error(`Bad response: ${response.status} - ${response.body}`)\n    }\n\n    let finalData = await response.json()\n    return finalData.access_token",
+    "revokeCode": "    // Taken from here: https://developers.google.com/identity/protocols/oauth2/web-server\n    let url = `https://oauth2.googleapis.com/revoke`\n    let data = {\n        \"token\": parameters.callbackValue,\n    }\n\n    let parametersString = \"\"\n    Object.keys(data).forEach((key, index) =\u003e {\n        let delimiter = \"?\"\n        if (index \u003e 0) {\n            delimiter = \"\u0026\"\n        }\n        parametersString += delimiter + key + \"=\" + encodeURIComponent(data[key])\n    })\n\n    let response = await fetch(url + parametersString, {\n        method: \"POST\",\n        headers: {\n            \"Content-Type\": \"application/x-www-form-urlencoded\"\n        },\n    })\n    if (!response.ok) {\n        throw new Error(`Bad response: ${response.status} - ${response.body}`)\n    }\n    return await response.json()"
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "id": "list_files",
+  "type": "javascript",
+  "meta": {
+    "code": "    let queryParameters = {\n        \"corpora\": \"user\",\n        \"q\":`'${parameters.folder_id}' in parents and trashed = false`,\n        \"orderBy\": \"createdTime desc\",\n    }\n\n    let parametersString = \"\"\n    Object.keys(queryParameters).forEach((key, index) =\u003e {\n        let delimiter = \"?\"\n        if (index \u003e 0) {\n            delimiter = \"\u0026\"\n        }\n        parametersString += delimiter + key + \"=\" + encodeURIComponent(queryParameters[key])\n    })\n\n    let response = await fetch(`https://www.googleapis.com/drive/v3/files${parametersString}`, {\n        method: \"GET\",\n        headers: {\n            \"Accept\": \"application/json\",\n            \"Content-Type\": \"application/json\",\n            \"Authorization\": `Bearer ${parameters.access_token}`\n        },\n    })\n    if (!response.ok) {\n        throw new Error(`Bad response: ${response.status} - ${response.body}`)\n    }\n    return await response.json()",
+    "parameters": [
+      {
+        "key": "folder_id",
+        "type": "string",
+        "value": ""
+      },
+      {
+        "key": "access_token",
+        "type": "string",
+        "value": ""
+      }
+    ]
+  }
+}
